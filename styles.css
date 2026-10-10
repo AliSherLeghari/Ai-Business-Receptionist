@@ -693,3 +693,8 @@ main, .list-item>div, .page-head>div {
   .voice-actions button { flex: 1; }
   .voice-toggle { width: 100%; }
 }
+
+/* Public release identifiers only; never business or device data. */
+footer { flex-wrap: wrap; }
+.build-diagnostics { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; width: 100%; overflow-wrap: anywhere; }
+.build-diagnostics button { font-size: .75rem; padding: 5px 9px; }

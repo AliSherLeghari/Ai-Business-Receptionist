@@ -1,0 +1,86 @@
+{
+  "version": "2.1.0",
+  "build": "74fb8d927f72e88f9b05",
+  "assets": [
+    {
+      "url": "./",
+      "sha256": "1531464e45be7e9cf900eb2eedaf1f1856a277beac547873e4b28dba225940f1"
+    },
+    {
+      "url": "./assets/74fb8d927f72e88f9b05/js/app.js",
+      "sha256": "a0dcb73592b85597a3417fc82d552a4da44237590d9f8b0c66f7454aa9b4ef93"
+    },
+    {
+      "url": "./assets/74fb8d927f72e88f9b05/js/conversations.js",
+      "sha256": "62c286bd21e1f22e8f9259d975904774fcfade5c0b48f56970e447e0cf5b17c9"
+    },
+    {
+      "url": "./assets/74fb8d927f72e88f9b05/js/demo-knowledge.js",
+      "sha256": "efa941eebe3c3b144d15304c353d17c04963deb7f383e005160fb0688eb45b3c"
+    },
+    {
+      "url": "./assets/74fb8d927f72e88f9b05/js/demo.js",
+      "sha256": "504fda75cd85a6ca2e04afd9d87a75b94524e95d58054b0ac83cdada9990eb46"
+    },
+    {
+      "url": "./assets/74fb8d927f72e88f9b05/js/matching.js",
+      "sha256": "c03513ed14eba5f5d94f6ceb8fd343acfea3604e0d60cde1a0a5bb5233eef2f2"
+    },
+    {
+      "url": "./assets/74fb8d927f72e88f9b05/js/model.js",
+      "sha256": "2e5a5783237961525438255da89f950b267b822f0bf18ebba2825d62eddf5550"
+    },
+    {
+      "url": "./assets/74fb8d927f72e88f9b05/js/pwa.js",
+      "sha256": "beba121c67a09a15f3ca06d0482005f496f1b55fe70198063e50fb66785aae35"
+    },
+    {
+      "url": "./assets/74fb8d927f72e88f9b05/js/receptionist.js",
+      "sha256": "7cc3d7c7786f7a6c9a74993b4c3d3f852161e361eae56ec1d737aa8885194bac"
+    },
+    {
+      "url": "./assets/74fb8d927f72e88f9b05/js/storage.js",
+      "sha256": "86a23cc357706125217df324fa4ea058d1419ce838a17ac90ed3ad46a7ff9564"
+    },
+    {
+      "url": "./assets/74fb8d927f72e88f9b05/js/version.js",
+      "sha256": "71c44c48d372b921a5363ce7f5aa22308fd9b9a533754c0df475df38bf93d97d"
+    },
+    {
+      "url": "./assets/74fb8d927f72e88f9b05/js/voice.js",
+      "sha256": "260efd1002da6589563ec92cedc5f22589f79722275a3637f0c40017a71f2cab"
+    },
+    {
+      "url": "./assets/74fb8d927f72e88f9b05/styles.css",
+      "sha256": "d40131b1b78fabcdae1e2ebd888d78e25ccc13aa2819e4dbfd164df1838d68bd"
+    },
+    {
+      "url": "./index.html",
+      "sha256": "1531464e45be7e9cf900eb2eedaf1f1856a277beac547873e4b28dba225940f1"
+    },
+    {
+      "url": "./demo.html",
+      "sha256": "5c555c277598d99a3c8e7fa62bbf034840088158a8d77ab5a3b8d9670551f81a"
+    },
+    {
+      "url": "./manifest.webmanifest",
+      "sha256": "4a735fb52adafa50bf2c03ec03ea02e12fcd4f524ec2dc04cad0b7155e02c776"
+    },
+    {
+      "url": "./icons/icon-192.png",
+      "sha256": "4fa1f80c93dcad77741efd198e66d3bdd280a1412a4ab1c00e241a8661832383"
+    },
+    {
+      "url": "./icons/icon-512.png",
+      "sha256": "a5990325216829820a7255d09000da1298cdee67d5898a38491677b0b33db09a"
+    },
+    {
+      "url": "./icons/icon.svg",
+      "sha256": "1a37c673a24e17df69e00929816f5e0f76e91277805113286a4a4fe8fb1bc0e3"
+    },
+    {
+      "url": "./icons/maskable-512.png",
+      "sha256": "a5990325216829820a7255d09000da1298cdee67d5898a38491677b0b33db09a"
+    }
+  ]
+}
