@@ -2,9 +2,29 @@
 
 **Reception Desk** is a mobile-friendly, browser-local business dashboard and
 knowledge-based chat receptionist. It uses plain HTML, CSS, and JavaScript with
-no application dependencies, backend, account, paid API, or build step. Phase 2
+no application dependencies, backend, account, or paid API. A dependency-free
+release command packages immutable static assets for GitHub Pages. Phase 2
 adds improved rule-based question understanding, optional browser speech, and a
 separate fictional customer demo. It is **not a generative LLM or telephone system**.
+
+## Answering upgrade fix (2.1.0)
+
+A Phase 1 service worker could serve its cached engine to the new Phase 2 demo.
+The new release uses content-derived asset directories and verifies offline
+asset digests before activation. The full evidence, production-access limitation,
+and regression procedure are in [the investigation](docs/answering-upgrade-investigation.md).
+The footer now reports app version, build, engine version, and controlling worker.
+
+Source changes must be packaged before previewing, testing, or publishing:
+
+```sh
+npm run release
+npm run check:release
+```
+
+This uses only built-in Node.js modules. Commit the generated HTML, `assets/`,
+`sw.js`, and `release-manifest.json` with source changes. Existing checked-in
+releases can be served immediately; no server-side compilation is needed.
 
 ## Run locally
 
@@ -84,6 +104,7 @@ external AI, API keys, or broad fuzzy similarity are involved.
 | `When do you open?` / `What time does your shop close?` | Confirmed weekly hours |
 | `Are you open on Friday?` | Friday's confirmed regular hours |
 | `Where is your shop?` / `What is your adress?` | Saved address |
+| `What services do you provide?` | Saved service list, including explicit prices |
 | `How much for battery replacement?` | Saved service and explicit price |
 | `What's the cost of changing my screen?` | A uniquely matching screen replacement service |
 | `Can you fix Samsung phones?` | Explicit Samsung phone repair service or matching FAQ; generic phone repair does not prove brand support |
@@ -139,7 +160,8 @@ when supported. Recognition is configured for English (`en-US`).
 ### Manual voice testing on Android Chrome
 
 1. Open the deployed HTTPS `demo.html` URL in current Android Chrome. After a
-   deployment, close older site/PWA tabs and reopen so the v2 worker can activate.
+   deployment, allow the new worker to install and normally reload an already-open
+   demo once. Check the footer build/engine/worker identifiers.
    Confirm that the microphone is initially off and no permission prompt appears.
 2. Tap **Start microphone**, allow the site's microphone permission, and say
    “How much for battery replacement?” Confirm that listening ends and the words
@@ -171,13 +193,24 @@ footer to say **Ready for offline use** before disconnecting.
   disable installation or persistence. Installed apps use their own browser's
   storage context, which can differ by platform.
 
-The v2 service worker precaches both HTML entry points and all new matching,
-voice, and fictional-demo modules as part of the static application shell. Customer data is
-stored in localStorage, not the service-worker cache. The app works at a domain
-root or in a subdirectory because asset and manifest paths are relative. Workers
-wait for old tabs to close before activating updates; close all app windows and
-reopen to adopt a new version. Developers must bump the shell cache version in
-`sw.js` when changing shipped assets. Cache cleanup only touches this app's prefix.
+The worker precaches the generated HTML, immutable JS/CSS release, icons, and
+manifest. It bypasses fresh HTTP cache entries and checks each asset's SHA-256
+before activating; a partial or stale deployment retains the previous offline
+release. The worker activates after verification without forcibly reloading open
+forms. Running documents retain their code until the next navigation/reload.
+
+For an old Phase 1/2 tab, visit online and reload the demo after installation;
+do not clear site data. New pages display the running app/engine/build and the
+controlling worker separately. **Reload update** appears when a later worker
+build controls an older document; save edits before using it. A legacy worker is
+explicitly labeled, and update failure leaves the previous cache available.
+
+The current and preceding application caches are retained; unrelated cache names
+and localStorage records are untouched. Owner customer data stays in localStorage;
+the fictional demo's current chat stays in memory. Module URLs are exact release
+identities, not query-string cache busters. The app supports domain roots and
+GitHub Pages project subdirectories. Generate a new release for every app-shell
+change and publish its complete asset set together.
 The connection badge uses the browser's connectivity hint, not a server probe.
 
 ## Data and limitations
@@ -220,7 +253,10 @@ The connection badge uses the browser's connectivity hint, not a server probe.
 | `js/demo-knowledge.js` | Explicitly fictional public knowledge, no owner/customer records |
 | `js/conversations.js` | Conversation lifecycle and immutable answer snapshots; injectable answer adapter |
 | `js/app.js` | UI rendering, accessible forms, navigation, backup actions, PWA lifecycle |
-| `sw.js` | Versioned offline app-shell caching |
+| `js/pwa.js`, `js/version.js` | Public runtime diagnostics, worker registration, and non-disruptive update UI |
+| `scripts/build-release.mjs` | Deterministic static packaging and digest manifest; no third-party dependencies |
+| `scripts/service-worker.js` | Editable worker template: verify, activate, cache exact asset identities |
+| `sw.js`, `release-manifest.json`, `assets/` | Generated, committed offline release |
 | `manifest.webmanifest`, `icons/` | Install metadata and regular/maskable app icons |
 
 The UI accesses data through the repository. The receptionist has no DOM,
@@ -249,13 +285,21 @@ npm test
 node tests/core.test.js
 node tests/matching.test.js
 node tests/voice.test.js
+node tests/release.test.js
 ```
+
+Run `npm run check:release` to detect missing/stale generated output.
 
 The core tests cover knowledge accuracy/abstention, owner escalation, ambiguity,
 business isolation, historical answer snapshots, summary review state, validation,
 quota failures, corrupt data preservation, and stale-tab writes. Additional suites
 cover normalized/ambiguous queries, escalation priority, old saved data, voice
 permission/errors, opt-in speech, timeout/stop behavior, and stale callbacks.
+
+Upgrade tests use the actual historical Phase 1/2 Git commits, so retain full
+repository history when cloning to run the suite. They simulate deployment
+transitions, stale responses, normal reloads, private saved data, unsaved forms,
+and offline restart. No production writes or network fetches are performed.
 
 The browser suite uses development-only **Python Playwright** and an installed
 Chromium; both are already available in the verified cloud environment:
@@ -277,8 +321,11 @@ preserved unchanged. Screenshots are written to `/tmp/reception-desk-desktop.png
 `/tmp/reception-desk-mobile.png`, `/tmp/reception-desk-phase2-desktop.png`, and
 `/tmp/reception-desk-phase2-mobile.png`. The suite does not automate an OS-level installation.
 
-Before committing, also run `git diff --check`. There is no compilation or build
-step. Existing editor settings and the saved preview task are unchanged.
+Before committing, run `npm run check:release` and `git diff --check`. No framework
+compiler or dependency installation is needed. The lightweight release packager
+must run after editing source JS, CSS, HTML, icons, the manifest, or worker template.
+Keep previously published `assets/<build>/` paths immutable; do not overwrite
+them with different code. Existing editor settings and preview tasks are unchanged.
 
 ## Static hosting
 
@@ -287,14 +334,16 @@ Publish only these application files over HTTPS:
 ```text
 index.html
 demo.html
-styles.css
-js/
+assets/
 icons/
 manifest.webmanifest
 sw.js
+release-manifest.json
 ```
 
 Do not publish `.git`, tests, editor configuration, backups, or private data.
+Publish generated artifacts from one commit together. Root `js/` and `styles.css`
+are editable sources; the HTML uses the packaged copies under `assets/`.
 Configure a valid JavaScript MIME type for modules and the service worker; serve
 `sw.js` with revalidation rather than a long immutable cache. The files remain compatible with GitHub Pages project subdirectories; the PR
 does not change Pages settings or merge/deploy itself.

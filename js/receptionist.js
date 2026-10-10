@@ -1,5 +1,6 @@
 import { questionText, needsOwner, faqKey, serviceKey, serviceQuery, hoursIntent } from './matching.js';
 export { normalize } from './matching.js';
+export const ENGINE_VERSION = '2.1.0';
 // Pure, local knowledge adapter. No network, generative model, or other business.
 const result = (answer, source) => ({ answer, status: 'answered', source });
 const unknown = () => ({ answer: 'I don’t have a verified answer to that in this business’s saved information. I’ve flagged your question for the owner in this browser. No notification has been sent.', status: 'unknown', source: 'Missing knowledge' });
@@ -28,7 +29,7 @@ export function respond(business, question) {
   }
   if (/^(what is your email(?: address)?|email address|email)$/.test(q)) return business.email ? result(business.email, 'Email') : unknown();
   if (/^(about|about your business|tell me about your business|what do you do)$/.test(q)) return business.description ? result(business.description, 'Business description') : unknown();
-  if (/^(services|prices|price list|what services do you offer|what are your services|what are your prices|how much do your services cost)$/.test(q)) {
+  if (/^(services|prices|price list|what services do you (?:offer|provide)|what are your services|what are your prices|how much do your services cost)$/.test(q)) {
     return business.services.length ? result(business.services.map(s => `${s.name}: ${s.price || 'Price not provided'}${s.description ? ` — ${s.description}` : ''}`).join('\n'), 'Services and prices') : unknown();
   }
   const query = serviceQuery(q);

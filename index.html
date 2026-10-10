@@ -8,16 +8,16 @@
   <link rel="manifest" href="./manifest.webmanifest">
   <link rel="icon" href="./icons/icon.svg" type="image/svg+xml">
   <link rel="apple-touch-icon" href="./icons/icon-192.png">
-  <link rel="stylesheet" href="./styles.css">
+  <link rel="stylesheet" href="./assets/74fb8d927f72e88f9b05/styles.css">
   <title>Reception Desk</title>
 </head>
 <body>
   <header class="topbar"><a class="brand" href="./"><span class="brand-mark" aria-hidden="true">R</span><span>Reception Desk<small>Business workspace</small></span></a><div class="header-actions"><a class="button" href="./demo.html">Customer demo</a><span id="connection" class="badge">Local workspace</span><button id="install" hidden>Install app</button><button id="backup">Export backup</button><button id="restore-button">Restore backup</button><input id="restore" type="file" accept="application/json,.json" hidden></div></header>
   <div id="notice" role="status" aria-live="polite" hidden></div>
   <div class="layout"><aside><label for="business-select">Your businesses <span id="business-count"></span></label><select id="business-select" aria-label="Active business"></select><button id="add-business" class="add-business">+ Add business</button><nav id="navigation" aria-label="Workspace"></nav><p class="local-note">Saved on this browser only.<br>No calls, cloud sync, or owner notifications.</p></aside><main id="main" tabindex="-1"></main></div>
-  <footer><span id="offline-status">Offline support is preparing…</span><span>Phase 2 · Knowledge-based chat & optional voice</span></footer>
+  <footer><span id="offline-status">Offline support is preparing…</span><span>Phase 2 · Knowledge-based chat & optional voice</span><span class="build-diagnostics"><span id="build-info">Build diagnostics loading…</span><button type="button" id="reload-update" hidden>Reload update</button></span></footer>
   <dialog id="business-dialog"><form id="new-business-form"><h2>Add a business</h2><p>Create a separate knowledge base and conversation inbox.</p><label>Business name<input name="name" required maxlength="100" autocomplete="organization"></label><div class="actions"><button type="button" id="cancel-business">Cancel</button><button class="primary">Create business</button></div></form></dialog>
   <noscript>This application requires JavaScript to store your business information and run the receptionist.</noscript>
-  <script type="module" src="./js/app.js"></script>
+  <script type="module" src="./assets/74fb8d927f72e88f9b05/js/app.js"></script>
 </body>
 </html>

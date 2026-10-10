@@ -1,3 +1,4 @@
+import { initializePWA } from './pwa.js';
 import { demoKnowledge } from './demo-knowledge.js';
 import { respond } from './receptionist.js';
 import { mountVoice } from './voice.js';
@@ -38,8 +39,4 @@ document.querySelector('#reset-demo').addEventListener('click', () => {
   // Reload discards all in-memory text and stops voice without touching storage.
   voice.destroy(); location.reload();
 });
-if ('serviceWorker' in navigator) {
-  navigator.serviceWorker.register('./sw.js').then(() => navigator.serviceWorker.ready).then(() => {
-    document.querySelector('#offline-status').textContent = 'Text demo ready offline · Browser speech may need internet';
-  }).catch(() => { document.querySelector('#offline-status').textContent = 'Offline cache unavailable. Use HTTPS or localhost and reload.'; });
-} else document.querySelector('#offline-status').textContent = 'Offline caching is unavailable in this browser.';
+initializePWA('Text demo ready offline · Browser speech may need internet');

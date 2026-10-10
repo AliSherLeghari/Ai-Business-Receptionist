@@ -1,7 +1,12 @@
 {
   "name": "ai-business-receptionist",
-  "version": "1.0.0",
+  "version": "2.1.0",
   "private": true,
   "type": "module",
-  "scripts": { "test": "node --test tests/*.test.js", "start": "python3 -m http.server 8000 --bind 0.0.0.0" }
+  "scripts": {
+    "test": "node --test tests/*.test.js",
+    "start": "python3 -m http.server 8000 --bind 0.0.0.0",
+    "release": "node scripts/build-release.mjs",
+    "check:release": "node scripts/build-release.mjs --check"
+  }
 }

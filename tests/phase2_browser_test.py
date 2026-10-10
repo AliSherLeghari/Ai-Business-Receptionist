@@ -166,7 +166,8 @@ class Phase2BrowserTests(unittest.TestCase):
                 self.context.add_init_script(SPEECH_MOCK)
                 self.page.goto(f'http://127.0.0.1:{server.server_port}/project/demo.html')
                 self.page.evaluate('async () => { await navigator.serviceWorker.ready; if (!navigator.serviceWorker.controller) await new Promise(r => navigator.serviceWorker.addEventListener("controllerchange", r, {once:true})); }')
-                self.assertTrue(self.page.evaluate('async () => (await caches.keys()).includes("reception-desk-shell-v2")'))
+                build = json.loads((phase1.ROOT / 'release-manifest.json').read_text())['build']
+                self.assertTrue(self.page.evaluate('async (build) => (await caches.keys()).includes("reception-desk-shell-" + build)', build))
                 self.context.set_offline(True)
                 self.page.reload()
                 self.send_demo('Can you fix Samsung phones?')

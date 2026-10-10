@@ -1,3 +1,4 @@
+import { initializePWA } from './pwa.js';
 import { createBusiness, DAYS, uid, summary, validateState } from './model.js';
 import { Repository, STORAGE_KEY } from './storage.js';
 import { ask, startConversation } from './conversations.js';
@@ -198,8 +199,4 @@ $('#install').addEventListener('click', async () => { if (installPrompt) { await
 window.addEventListener('appinstalled', () => { $('#install').hidden = true; notice('Reception Desk installed.'); });
 const connection = () => { $('#connection').textContent = navigator.onLine ? 'Local workspace' : 'Offline · local workspace'; };
 window.addEventListener('online', connection); window.addEventListener('offline', connection); connection();
-if ('serviceWorker' in navigator) {
-  navigator.serviceWorker.register('./sw.js').then(() => navigator.serviceWorker.ready).then(() => {
-    $('#offline-status').textContent = 'Ready for offline use · Install from your browser’s menu';
-  }).catch(() => { $('#offline-status').textContent = 'Offline support unavailable. Use HTTPS or localhost and reload.'; });
-} else $('#offline-status').textContent = 'Offline support requires a browser with service workers.';
+initializePWA('Ready for offline use · Install from your browser’s menu');
