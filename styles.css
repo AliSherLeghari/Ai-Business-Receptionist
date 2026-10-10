@@ -653,3 +653,43 @@ main, .list-item>div, .page-head>div {
     text-align: center;
   }
 }
+/* Shared opt-in voice controls; never overlap the message input on mobile. */
+.voice-panel {
+  border-top: 1px solid var(--line);
+  margin-top: 20px;
+  padding-top: 18px;
+}
+.voice-actions {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+.voice-toggle {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+.voice-toggle input {
+  margin: 0;
+}
+[data-mic][aria-pressed=true] {
+  background: #fff0d8;
+  border-color: #b78326;
+}
+.demo-main {
+  max-width: 860px;
+  min-height: calc(100vh - 154px);
+}
+.demo-chat-heading {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 18px;
+}
+@media (max-width: 640px) {
+  .voice-actions { gap: 10px; }
+  .voice-actions button { flex: 1; }
+  .voice-toggle { width: 100%; }
+}
