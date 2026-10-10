@@ -1,6 +1,8 @@
 import { createBusiness, DAYS, uid, summary, validateState } from './model.js';
 import { Repository, STORAGE_KEY } from './storage.js';
 import { ask, startConversation } from './conversations.js';
+import { mountVoice } from './voice.js';
+let voiceSession = null, spokenReplies = false;
 
 const $ = selector => document.querySelector(selector);
 const escape = value => String(value ?? '').replace(/[&<>"']/g, char => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[char]));
@@ -46,7 +48,7 @@ function faqs(b) {
 }
 function chat(b) {
   const c = b.conversations.find(c => c.id === conversationId);
-  return head('Receptionist', 'A customer chat powered by your saved business knowledge.', c ? '<button data-action="new-chat">New conversation</button>' : '') + '<p class="note">Conversations stay on this device. Owner flags are visible here only; no external messages or telephone calls are sent.</p>' + (c ? `<section class="panel"><h2>${escape(c.customer)}</h2><p class="muted">${escape(c.contact || 'No contact details shared')} · ${escape(formatDate(c.createdAt))}</p><div class="chat-log" id="chat-log" role="log" aria-label="Conversation messages" aria-live="polite">${c.turns.length ? c.turns.map(t => `<div class="message customer"><small>Customer</small><div class="copy">${escape(t.question)}</div></div><div class="message"><small>Receptionist</small><div class="copy">${escape(t.answer)}</div><small class="source">${escape(t.source)}</small>${badge(t)}</div>`).join('') : '<p class="muted">Welcome. Ask about our hours, address, services, or FAQs.</p>'}</div><div class="suggestions">${['What are your hours?', 'What services do you offer?', 'Where are you located?'].map(q => `<button class="small" data-question="${q}">${q}</button>`).join('')}</div><form id="chat-form" class="chat-form"><label>Your question<textarea name="question" required maxlength="1000" placeholder="Type a question…"></textarea></label><button class="primary">Send question</button></form></section>` : `<section class="panel"><h2>Start a customer conversation</h2><p class="muted">A name and contact detail are optional. Avoid storing sensitive information.</p><form id="conversation-form"><div class="form-grid"><label>Customer name<input name="customer" maxlength="100" placeholder="Guest" autocomplete="off"></label><label>Contact details (optional)<input name="contact" maxlength="200" placeholder="Phone or email for your records" autocomplete="off"></label></div><button class="primary">Start conversation</button></form></section>`);
+  return head('Receptionist', 'A customer chat powered by your saved business knowledge.', c ? '<button data-action="new-chat">New conversation</button>' : '') + '<p class="note">Conversations stay on this device. Owner flags are visible here only; no external messages or telephone calls are sent.</p>' + (c ? `<section class="panel"><h2>${escape(c.customer)}</h2><p class="muted">${escape(c.contact || 'No contact details shared')} · ${escape(formatDate(c.createdAt))}</p><div class="chat-log" id="chat-log" role="log" aria-label="Conversation messages" aria-live="polite">${c.turns.length ? c.turns.map(t => `<div class="message customer"><small>Customer</small><div class="copy">${escape(t.question)}</div></div><div class="message"><small>Receptionist</small><div class="copy">${escape(t.answer)}</div><small class="source">${escape(t.source)}</small>${badge(t)}</div>`).join('') : '<p class="muted">Welcome. Ask about our hours, address, services, or FAQs.</p>'}</div><div class="suggestions">${['What are your hours?', 'What services do you offer?', 'Where are you located?'].map(q => `<button class="small" data-question="${q}">${q}</button>`).join('')}</div><form id="chat-form" class="chat-form"><label>Your question<textarea name="question" required maxlength="1000" placeholder="Type a question…"></textarea></label><button class="primary">Send question</button></form><div id="owner-voice" class="voice-panel"></div></section>` : `<section class="panel"><h2>Start a customer conversation</h2><p class="muted">A name and contact detail are optional. Avoid storing sensitive information.</p><form id="conversation-form"><div class="form-grid"><label>Customer name<input name="customer" maxlength="100" placeholder="Guest" autocomplete="off"></label><label>Contact details (optional)<input name="contact" maxlength="200" placeholder="Phone or email for your records" autocomplete="off"></label></div><button class="primary">Start conversation</button></form></section>`);
 }
 function history(b) {
   const conversations = [...b.conversations].reverse().filter(c => !pendingOnly || summary(c).pending.length);
@@ -56,6 +58,7 @@ function history(b) {
   }).join('') : empty('No conversations to show', pendingOnly ? 'There are no questions waiting for owner review.' : 'Start a conversation in the Receptionist tab. Customer history will appear here.'));
 }
 function render() {
+  voiceSession?.destroy(); voiceSession = null;
   const state = repo?.read() || { businesses: [] };
   if (!state.businesses.some(b => b.id === activeId)) activeId = state.businesses[0]?.id || '';
   $('#business-select').innerHTML = state.businesses.length ? state.businesses.map(b => `<option value="${escape(b.id)}" ${b.id === activeId ? 'selected' : ''}>${escape(b.name)}</option>`).join('') : '<option>No businesses yet</option>';
@@ -69,19 +72,26 @@ function render() {
   }
   $('#main').innerHTML = ({ overview, business: info, services, faqs, chat, history })[tab](business());
   if ($('#chat-log')) $('#chat-log').scrollTop = $('#chat-log').scrollHeight;
+  if ($('#owner-voice')) voiceSession = mountVoice($('#owner-voice'), {
+    spoken: spokenReplies, onSpokenChange: enabled => { spokenReplies = enabled; },
+    onTranscript: text => { const input = $('[name="question"]'); input.value = text; dirty = true; input.focus(); },
+  });
 }
 function openBusinessDialog() {
+  voiceSession?.stop();
   if (!discard()) return;
   if ((repo?.read().businesses.length || 0) >= 3) return notice('You can manage up to three businesses.', true);
   $('#new-business-form').reset(); $('#business-dialog').showModal();
 }
 function changeTab(next) {
+  voiceSession?.stop();
   if (!discard()) return;
   dirty = false; tab = next; editId = ''; render(); $('#main').focus();
 }
 $('#add-business').addEventListener('click', openBusinessDialog);
 $('#cancel-business').addEventListener('click', () => $('#business-dialog').close());
 $('#business-select').addEventListener('change', event => {
+  voiceSession?.stop();
   if (!discard()) { event.target.value = activeId; return; }
   activeId = event.target.value; conversationId = ''; editId = ''; dirty = false; render();
 });
@@ -148,7 +158,11 @@ document.addEventListener('submit', event => {
   }
   if (form.id === 'conversation-form') commit(() => repo.business(activeId, b => { conversationId = startConversation(b, value('customer'), value('contact')); }), 'Conversation started.');
   if (form.id === 'chat-form') {
-    if (commit(() => repo.business(activeId, b => ask(b, conversationId, value('question'))))) $('[name="question"]').focus();
+    voiceSession?.stop();
+    if (commit(() => repo.business(activeId, b => ask(b, conversationId, value('question'))))) {
+      $('[name="question"]').focus();
+      voiceSession?.speak(business().conversations.find(c => c.id === conversationId).turns.at(-1).answer);
+    }
   }
   if (form.classList.contains('note-form')) commit(() => repo.business(activeId, b => { b.conversations.find(c => c.id === form.dataset.conversation).note = value('note'); }), 'Owner note saved locally.');
 });
@@ -161,7 +175,7 @@ $('#backup').addEventListener('click', () => {
     notice('Backup exported. It contains business and customer data; keep it private.');
   } catch { notice('Browser storage could not be accessed for export.', true); }
 });
-$('#restore-button').addEventListener('click', () => $('#restore').click());
+$('#restore-button').addEventListener('click', () => { voiceSession?.stop(); $('#restore').click(); });
 $('#restore').addEventListener('change', async event => {
   const file = event.target.files[0]; event.target.value = '';
   if (!file) return;

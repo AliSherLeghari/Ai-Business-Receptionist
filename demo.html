@@ -1,0 +1,32 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#164e43">
+  <meta name="description" content="A fictional customer receptionist demo with optional browser voice.">
+  <link rel="icon" href="./icons/icon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="./styles.css">
+  <title>Customer Demo · Reception Desk</title>
+</head>
+<body class="customer-demo">
+  <header class="topbar"><div class="brand"><span class="brand-mark" aria-hidden="true">R</span><span>Reception Desk<small>Customer demonstration</small></span></div><span class="badge">Fictional business</span></header>
+  <main class="demo-main">
+    <p class="eyebrow">Local, rule-based receptionist</p>
+    <h1 id="demo-name">Example Repair Studio (fictional)</h1>
+    <p class="subtitle">Ask about hours, services, prices, or location. Every business detail here is an invented example.</p>
+    <p class="note">Demo only. No real appointments, calls, or owner notifications. This conversation lasts until you reset or reload. It does not read or change saved owner data, and local business data does not sync between devices.</p>
+    <section class="panel" aria-label="Customer chat">
+      <div class="demo-chat-heading"><h2>How can we help?</h2><button type="button" id="reset-demo">Reset chat</button></div>
+      <div id="demo-log" class="chat-log" role="log" aria-label="Conversation messages" aria-live="polite"><p class="muted">Welcome! Try a question below, or type your own.</p></div>
+      <div class="suggestions"><button type="button" data-question="What time does your shop close?">Opening hours</button><button type="button" data-question="How much for battery replacement?">Battery replacement</button><button type="button" data-question="Can you fix Samsung phones?">Samsung repairs</button></div>
+      <form id="demo-form" class="chat-form"><label for="demo-question">Your question<textarea id="demo-question" name="question" maxlength="1000" required placeholder="Ask a question…"></textarea></label><button class="primary">Send question</button></form>
+      <div id="demo-voice" class="voice-panel"></div>
+      <p id="demo-status" role="status" class="hint"></p>
+    </section>
+  </main>
+  <footer><span id="offline-status">Offline support is preparing…</span><span>Phase 2 · Optional browser voice, no telephone calls</span></footer>
+  <noscript>Enable JavaScript to try the local receptionist demonstration.</noscript>
+  <script type="module" src="./js/demo.js"></script>
+</body>
+</html>
